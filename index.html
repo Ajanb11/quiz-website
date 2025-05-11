@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .question {
+            font-size: 24px;
+            color: #333;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .option {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #2980b9;
+        }
+        .option.correct {
+            background-color: #2ecc71;
+        }
+        .option.incorrect {
+            background-color: #e74c3c;
+        }
+        .next-btn {
+            background-color: #8e44ad;
+            color: #fff;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s;
+        }
+        .next-btn:hover {
+            background-color: #9b59b6;
+        }
+        .result {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Game</h1>
+        <div id="quiz-container">
+            <div class="question" id="question">Question will appear here</div>
+            <div class="options" id="options"></div>
+            <button class="next-btn hidden" id="next-btn" onclick="nextQuestion()">Next Question</button>
+        </div>
+        <div id="result-container" class="result hidden">
+            <p id="result-message"></p>
+            <button class="next-btn" onclick="restartQuiz()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Madrid", "Paris", "Rome"],
+                answer: "Paris"
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Saturn"],
+                answer: "Mars"
+            },
+            {
+                question: "Who wrote 'To Kill a Mockingbird'?",
+                options: ["Harper Lee", "Jane Austen", "Mark Twain", "J.K. Rowling"],
+                answer: "Harper Lee"
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                answer: "Pacific Ocean"
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                options: ["Leonardo da Vinci", "Vincent van Gogh", "Pablo Picasso", "Claude Monet"],
+                answer: "Leonardo da Vinci"
+            },
+            {
+                question: "What is the square root of 64?",
+                options: ["6", "8", "10", "12"],
+                answer: "8"
+            },
+            {
+                question: "Which is the largest country in the world by area?",
+                options: ["Canada", "Russia", "China", "USA"],
+                answer: "Russia"
+            },
+            {
+                question: "In what year did the Titanic sink?",
+                options: ["1912", "1905", "1920", "1898"],
+                answer: "1912"
+            },
+            {
+                question: "Who discovered gravity?",
+                options: ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Nikola Tesla"],
+                answer: "Isaac Newton"
+            },
+            {
+                question: "What is the longest river in the world?",
+                options: ["Amazon River", "Nile River", "Yangtze River", "Mississippi River"],
+                answer: "Amazon River"
+            },
+            {
+                question: "What is the chemical symbol for water?",
+                options: ["O2", "CO2", "H2O", "N2"],
+                answer: "H2O"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById("question").textContent = questionData.question;
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = '';
+
+            questionData.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.classList.add("option");
+                button.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedOption) {
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const options = document.querySelectorAll(".option");
+            options.forEach(optionButton => {
+                if (optionButton.textContent === correctAnswer) {
+                    optionButton.classList.add("correct");
+                } else if (optionButton.textContent === selectedOption) {
+                    optionButton.classList.add("incorrect");
+                }
+                optionButton.disabled = true;
+            });
+
+            if (selectedOption === correctAnswer) {
+                score++;
+            }
+
+            document.getElementById("next-btn").classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+                document.getElementById("next-btn").classList.add("hidden");
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const resultMessage = `Your score is ${score} out of ${questions.length}.`;
+            document.getElementById("result-message").textContent = resultMessage;
+            document.getElementById("quiz-container").classList.add("hidden");
+            document.getElementById("result-container").classList.remove("hidden");
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById("result-container").classList.add("hidden");
+            document.getElementById("quiz-container").classList.remove("hidden");
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
